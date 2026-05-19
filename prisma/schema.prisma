@@ -13,7 +13,7 @@ datasource db {
 }
 
 model Profile {
-  id        String   @id // mesmo UUID do auth.users do Supabase
+  id        String   @id
   username  String?  @unique
   fullName  String?
   bio       String?
@@ -28,6 +28,7 @@ model Profile {
 model Recipe {
   id                String             @id @default(uuid())
   name              String
+  imageUrl          String?
   description       String
   timeToCook        Int
   createdAt         DateTime           @default(now())
@@ -40,7 +41,7 @@ model Recipe {
 
 model Ingredient {
   id                String             @id @default(uuid())
-  name              String
+  name              String             @unique
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   recipeIngredients RecipeIngredient[]
