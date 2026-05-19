@@ -32,8 +32,7 @@ export default async function RecipePage({
 
   return (
     <div className="min-h-screen bg-[#FAF6F2]">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-12 pb-16">
+      <div className="bg-linear-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-12 pb-16">
         <Link
           href="/recipes"
           className="inline-flex items-center gap-1 text-white/70 text-sm mb-6 hover:text-white transition-colors"
@@ -58,11 +57,12 @@ export default async function RecipePage({
             </span>
           )}
         </div>
+        <div className="absolute right-0">
+          <img src={recipe?.imageUrl} alt={recipe.name} />
+        </div>
       </div>
 
-      {/* Body */}
       <div className="bg-white rounded-t-3xl -mt-6 px-6 pt-8 pb-12 min-h-96">
-        {/* Descrição */}
         {recipe.description && (
           <div className="mb-8">
             <p className="text-[#3D2B1A]/70 text-sm leading-relaxed">
@@ -71,7 +71,6 @@ export default async function RecipePage({
           </div>
         )}
 
-        {/* Ingredientes */}
         <div className="mb-8">
           <h2 className="text-xs font-semibold text-[#7A4020]/60 uppercase tracking-widest mb-4">
             Ingredientes ({recipe.recipeIngredients.length})
@@ -94,7 +93,6 @@ export default async function RecipePage({
           </div>
         </div>
 
-        {/* Ações do dono */}
         {isOwner && (
           <div className="flex gap-3 pt-4 border-t border-[#E8D5C4]">
             <Link

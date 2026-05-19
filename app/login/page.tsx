@@ -48,7 +48,7 @@ export default function LoginScreen() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F2] flex flex-col">
-      <div className="bg-gradient-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-16 pb-10 flex flex-col items-center">
+      <div className="bg-linear-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-16 pb-10 flex flex-col items-center">
         <div className="flex items-center gap-2 mb-2">
           <ChefHat size={32} className="text-white" />
           <span className="text-3xl font-bold tracking-tight text-white">

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ChefHat, Plus, Trash2 } from "lucide-react";
+import { ChefHat, Plus, Trash2, ImagePlus, X } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const UNITS = [
   "g",
@@ -25,18 +26,21 @@ type IngredientRow = {
 };
 
 let nextId = 1;
-
 function makeRow(): IngredientRow {
   return { id: nextId++, name: "", quantity: "", unity: "g" };
 }
 
 export default function NewRecipe() {
   const router = useRouter();
+  const supabase = createClient();
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const [recipeName, setRecipeName] = useState("");
   const [description, setDescription] = useState("");
   const [timeToCook, setTimeToCook] = useState("");
   const [ingredients, setIngredients] = useState<IngredientRow[]>([makeRow()]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -59,6 +63,32 @@ export default function NewRecipe() {
     );
   }
 
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
+
+  function removeImage() {
+    setImageFile(null);
+    setImagePreview(null);
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  }
+
+  async function uploadImage(file: File, userId: string): Promise<string> {
+    const ext = file.name.split(".").pop();
+    const path = `${userId}/${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from("recipes")
+      .upload(path, file, { upsert: true });
+
+    if (error) throw error;
+
+    return supabase.storage.from("recipes").getPublicUrl(path).data.publicUrl;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -79,29 +109,42 @@ export default function NewRecipe() {
 
     setLoading(true);
 
-    const res = await fetch("/api/recipes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: recipeName.trim(),
-        description: description.trim(),
-        timeToCook: Number(timeToCook),
-        ingredients: validIngredients.map((i) => ({
-          name: i.name.trim(),
-          quantity: i.quantity.trim(),
-          unity: i.unity,
-        })),
-      }),
-    });
+    try {
+      let imageUrl: string | null = null;
+      if (imageFile) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) imageUrl = await uploadImage(imageFile, user.id);
+      }
+
+      const res = await fetch("/api/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: recipeName.trim(),
+          description: description.trim(),
+          timeToCook: Number(timeToCook),
+          imageUrl,
+          ingredients: validIngredients.map((i) => ({
+            name: i.name.trim(),
+            quantity: i.quantity.trim(),
+            unity: i.unity,
+          })),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        router.push(`/recipes/${data.id}`);
+      } else {
+        setError("Erro ao criar receita. Tente novamente.");
+      }
+    } catch {
+      setError("Erro ao fazer upload da imagem.");
+    }
 
     setLoading(false);
-
-    if (res.ok) {
-      const data = await res.json();
-      router.push(`/recipes/${data.id}`);
-    } else {
-      setError("Erro ao criar receita. Tente novamente.");
-    }
   }
 
   const inputClass =
@@ -121,6 +164,50 @@ export default function NewRecipe() {
 
       <div className="flex-1 bg-white rounded-t-3xl -mt-4 px-6 pt-8 pb-10 shadow-lg">
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {/* Imagem */}
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Foto da receita</label>
+            {imagePreview ? (
+              <div className="relative w-full h-48 rounded-2xl overflow-hidden">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                  aria-label="Remover imagem"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => imageInputRef.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 w-full h-36 rounded-2xl border-2 border-dashed border-[#E8D5C4] bg-[#FAF6F2] hover:border-[#C4622D] hover:bg-[#FFF5EE] transition-all"
+              >
+                <ImagePlus size={28} className="text-[#C4622D]/50" />
+                <span className="text-sm font-semibold text-[#C4622D]">
+                  Adicionar foto
+                </span>
+                <span className="text-xs text-[#7A4020]/40">
+                  JPG, PNG ou WEBP
+                </span>
+              </button>
+            )}
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleImageSelect}
+            />
+          </div>
+
+          {/* Nome */}
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Nome da receita</label>
             <input
@@ -131,6 +218,7 @@ export default function NewRecipe() {
             />
           </div>
 
+          {/* Descrição */}
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Descrição</label>
             <textarea
@@ -143,6 +231,7 @@ export default function NewRecipe() {
             />
           </div>
 
+          {/* Tempo */}
           <div className="flex flex-col gap-1.5">
             <label className={labelClass}>Tempo de preparo (minutos)</label>
             <input
@@ -158,9 +247,9 @@ export default function NewRecipe() {
 
           <div className="border-t border-[#E8D5C4]" />
 
+          {/* Ingredientes */}
           <div className="flex flex-col gap-3">
             <label className={labelClass}>Ingredientes</label>
-
             <div
               className="grid gap-2"
               style={{ gridTemplateColumns: "1fr 72px 90px 36px" }}
@@ -174,7 +263,6 @@ export default function NewRecipe() {
                 </span>
               ))}
             </div>
-
             <div className="flex flex-col gap-2">
               {ingredients.map((ing) => (
                 <div
@@ -191,7 +279,6 @@ export default function NewRecipe() {
                     placeholder="Farinha de trigo"
                     className="w-full px-3 py-2.5 rounded-xl border border-[#E8D5C4] bg-[#FAF6F2] text-[#3D2B1A] text-sm placeholder:text-[#7A4020]/30 focus:outline-none focus:ring-2 focus:ring-[#C4622D]/30 focus:border-[#C4622D] transition-all"
                   />
-
                   <input
                     type="text"
                     value={ing.quantity}
@@ -201,7 +288,6 @@ export default function NewRecipe() {
                     placeholder="2"
                     className="w-full px-2 py-2.5 rounded-xl border border-[#E8D5C4] bg-[#FAF6F2] text-[#3D2B1A] text-sm text-center placeholder:text-[#7A4020]/30 focus:outline-none focus:ring-2 focus:ring-[#C4622D]/30 focus:border-[#C4622D] transition-all"
                   />
-
                   <select
                     value={ing.unity}
                     onChange={(e) =>
@@ -215,7 +301,6 @@ export default function NewRecipe() {
                       </option>
                     ))}
                   </select>
-
                   <button
                     type="button"
                     onClick={() => removeIngredient(ing.id)}
@@ -228,17 +313,16 @@ export default function NewRecipe() {
                 </div>
               ))}
             </div>
-
             <button
               type="button"
               onClick={addIngredient}
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border-2 border-dashed border-[#E8D5C4] text-[#C4622D] text-sm font-semibold transition-colors hover:bg-[#FAF6F2] hover:border-[#C4622D]"
             >
-              <Plus size={16} />
-              Adicionar ingrediente
+              <Plus size={16} /> Adicionar ingrediente
             </button>
           </div>
 
+          {/* Preview ingredientes */}
           {ingredients.some((i) => i.name.trim()) && (
             <div className="bg-[#FAF6F2] rounded-xl p-4 border border-[#E8D5C4]">
               <p className="text-[10px] font-semibold text-[#7A4020]/60 uppercase tracking-wide mb-2">

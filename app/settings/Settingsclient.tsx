@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { BackButton } from "../_components/BackButton";
 
 type Profile = {
   id: string;
@@ -80,7 +81,7 @@ function Toggle({
         onClick={() => setOn(!on)}
         role="switch"
         aria-checked={on}
-        className="relative flex-shrink-0 transition-colors"
+        className="relative shrink-0 transition-colors"
         style={{
           width: 36,
           height: 20,
@@ -89,7 +90,7 @@ function Toggle({
         }}
       >
         <span
-          className="absolute top-[3px] transition-transform"
+          className="absolute top-0.75 transition-transform"
           style={{
             width: 14,
             height: 14,
@@ -208,12 +209,7 @@ export default function SettingsClient({
       style={{ position: "relative" }}
     >
       <div className="flex items-baseline gap-3 mb-8">
-        <span
-          className="font-display text-2xl italic"
-          style={{ color: "var(--accent)" }}
-        >
-          Receitas
-        </span>
+        <BackButton />
         <span style={style.muted}>/</span>
         <span className="text-sm" style={style.muted}>
           Configurações
@@ -274,7 +270,7 @@ export default function SettingsClient({
 
           <div className="flex items-end gap-4 mb-8">
             <div
-              className="relative w-16 h-16 rounded-full overflow-hidden cursor-pointer group flex-shrink-0"
+              className="relative w-16 h-16 rounded-full overflow-hidden cursor-pointer group shrink-0"
               style={{ backgroundColor: "var(--border)" }}
               onClick={() => avatarRef.current?.click()}
             >

@@ -88,7 +88,7 @@ export default function CadastroScreen() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F2] flex flex-col">
-      <div className="bg-gradient-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-14 pb-10 flex flex-col">
+      <div className="bg-linear-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-14 pb-10 flex flex-col">
         <button
           onClick={onNavigateToLogin}
           className="self-start mb-4 text-white/70 hover:text-white transition-colors flex items-center gap-1.5"

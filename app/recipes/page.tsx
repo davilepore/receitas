@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Clock, Plus, ChefHat } from "lucide-react";
+import { BackButton } from "../_components/BackButton";
 
 export default async function RecipesPage() {
   const supabase = await createClient();
@@ -22,7 +23,8 @@ export default async function RecipesPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F2]">
-      <div className="bg-gradient-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-12 pb-16">
+      <div className="bg-linear-to-br from-[#C4622D] via-[#7A4020]/80 to-[#3D2B1A] px-6 pt-12 pb-16">
+        <BackButton />
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <ChefHat size={22} className="text-white/80" />
@@ -73,7 +75,7 @@ export default async function RecipesPage() {
               <Link key={recipe.id} href={`/recipes/${recipe.id}`}>
                 <div className="group flex items-center justify-between p-4 rounded-2xl border border-[#E8D5C4] bg-[#FAF6F2] hover:border-[#C4622D]/40 hover:bg-white transition-all">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#C4622D]/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#C4622D]/10 flex items-center justify-center shrink-0">
                       <span className="text-sm font-bold text-[#C4622D]">
                         {String(i + 1).padStart(2, "0")}
                       </span>
