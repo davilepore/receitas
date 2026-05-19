@@ -1,5 +1,14 @@
 "use client";
-import { X, User, BookOpen, Compass, Settings, ChefHat } from "lucide-react";
+import {
+  X,
+  User,
+  BookOpen,
+  Compass,
+  Settings,
+  ChefHat,
+  Heart,
+  CircleQuestionMark,
+} from "lucide-react";
 import { useEffect } from "react";
 
 interface SidebarProps {
@@ -76,10 +85,15 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
           <NavItem icon={<User size={18} />} label="Minha Conta" />
           <NavItem icon={<BookOpen size={18} />} label="Minhas Receitas" />
           <NavItem icon={<Compass size={18} />} label="Descobrir Receitas" />
+          <NavItem icon={<Heart size={18} />} label="Favoritas" />
         </nav>
 
         <div className="px-3 pb-6 border-t border-gray-100 pt-3">
           <NavItem icon={<Settings size={18} />} label="Configurações" />
+          <NavItem
+            icon={<CircleQuestionMark size={18} />}
+            label="Ajuda e Suporte"
+          />
         </div>
       </aside>
     </>
