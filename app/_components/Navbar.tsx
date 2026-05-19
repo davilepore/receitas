@@ -2,8 +2,15 @@
 import { Settings, Menu } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import Link from "next/link";
 
-function Navbar() {
+type Profile = {
+  fullName: string | null;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+} | null;
+
+function Navbar({ profile }: { profile: Profile }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -21,15 +28,19 @@ function Navbar() {
           Receitas
         </a>
 
-        <a
-          href=""
+        <Link
+          href="/settings"
           className="p-2 rounded-full hover:bg-gray-100 transition-colors"
         >
           <Settings size={22} />
-        </a>
+        </Link>
       </nav>
 
-      <Sidebar isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <Sidebar
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        profile={profile}
+      />
     </>
   );
 }

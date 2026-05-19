@@ -14,9 +14,14 @@ import { useEffect } from "react";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  profile: {
+    fullName: string | null;
+    avatarUrl: string | null;
+    bannerUrl: string | null;
+  } | null;
 }
 
-function Sidebar({ isOpen, onClose }: SidebarProps) {
+function Sidebar({ isOpen, onClose, profile }: SidebarProps) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -65,19 +70,33 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         <div className="relative mb-4">
-          <div className="h-30 bg-gradient-to-r from-orange-400 to-amber-300" />
+          <div>
+            {profile?.bannerUrl ? (
+              <img
+                src={profile.bannerUrl}
+                alt="Banner do usuário"
+                className="w-full h-32 object-cover"
+              />
+            ) : (
+              <div className="w-full h-32 bg-gradient-to-r from-orange-400 to-amber-300" />
+            )}
+          </div>
 
           <div className="absolute left-4 top-20 w-16 h-16 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-md">
             <img
-              src="https://api.dicebear.com/7.x/adventurer/svg?seed=Maria"
+              src={
+                profile?.avatarUrl ||
+                "https://api.dicebear.com/7.x/adventurer/svg?seed=Maria"
+              }
               alt="Foto de perfil"
               className="w-full h-full object-cover"
             />
           </div>
 
           <div className="pt-10 px-4">
-            <p className="font-semibold text-gray-800">Maria Silva</p>
-            <p className="text-xs text-gray-400">maria@email.com</p>
+            <p className="font-semibold text-gray-800">
+              {profile?.fullName || "Maria Silva"}
+            </p>
           </div>
         </div>
 
