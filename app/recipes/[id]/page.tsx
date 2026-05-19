@@ -58,7 +58,7 @@ export default async function RecipePage({
           )}
         </div>
         <div className="absolute right-0">
-          <img src={recipe?.imageUrl} alt={recipe.name} />
+          <img src={recipe?.imageUrl ?? undefined} alt={recipe.name} />
         </div>
       </div>
 
