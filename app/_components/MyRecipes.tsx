@@ -76,7 +76,7 @@ async function MyRecipes() {
                     <img
                       src="/prato.png"
                       alt={recipe.name}
-                      className="w-full h-[140px] object-cover"
+                      className="w-full h-35 object-cover"
                     />
 
                     <CardContent className="p-4">

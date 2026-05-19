@@ -78,7 +78,7 @@ function Sidebar({ isOpen, onClose, profile }: SidebarProps) {
                 className="w-full h-32 object-cover"
               />
             ) : (
-              <div className="w-full h-32 bg-gradient-to-r from-orange-400 to-amber-300" />
+              <div className="w-full h-32 bg-linear-to-r from-orange-400 to-amber-300" />
             )}
           </div>
 
